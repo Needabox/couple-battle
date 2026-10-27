@@ -24,7 +24,11 @@ export const Header: React.FC<HeaderProps> = ({
   onRestart,
 }) => {
   const [copied, setCopied] = useState(false);
-  const [isMuted, setIsMuted] = useState(soundManager.isMuted());
+  const [isMuted, setIsMuted] = useState(false);
+
+  React.useEffect(() => {
+    setIsMuted(soundManager.isMuted());
+  }, []);
 
   const handleCopyLink = () => {
     if (typeof window === 'undefined') return;
