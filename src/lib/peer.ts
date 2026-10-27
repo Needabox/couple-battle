@@ -7,6 +7,7 @@ export interface PeerManagerEvents {
   onData: (message: PeerMessage) => void;
   onDisconnected: () => void;
   onError: (error: any) => void;
+  onRoomCodeChanged?: (newCode: string) => void;
 }
 
 export class PeerManager {
@@ -20,7 +21,7 @@ export class PeerManager {
     this.events = events;
   }
 
-  // Generates a room ID format e.g. "LOVE-482" or custom
+  // Generates a random room ID e.g. "K9X2P4"
   public static generateRoomCode(): string {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
     let code = '';
@@ -34,7 +35,7 @@ export class PeerManager {
     return `couplebattle-${roomCode.trim().toUpperCase()}`;
   }
 
-  public async initHost(roomCode: string) {
+  public async initHost(roomCode: string, retryCount = 0) {
     if (typeof window === 'undefined') return;
     this.cleanup();
     this.isHost = true;
@@ -61,8 +62,18 @@ export class PeerManager {
       this.setupConnection(conn);
     });
 
-    this.peer.on('error', (err) => {
+    this.peer.on('error', (err: any) => {
       console.warn('PeerJS Host error:', err);
+      // If the ID is already taken (e.g. from a previous tab or collision), auto-generate a new one!
+      if (err?.type === 'unavailable-id' && retryCount < 5) {
+        const newCode = PeerManager.generateRoomCode();
+        console.log(`Room ID "${roomCode}" was taken. Retrying with fresh code: "${newCode}"...`);
+        this.events.onRoomCodeChanged?.(newCode);
+        setTimeout(() => {
+          this.initHost(newCode, retryCount + 1);
+        }, 400);
+        return;
+      }
       this.events.onError(err);
     });
 

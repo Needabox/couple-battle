@@ -23,7 +23,7 @@ function CoupleBattleGame() {
   const urlRoom = searchParams.get('room');
 
   // Peer & Room State
-  const [roomCode, setRoomCode] = useState<string>('LOVE77');
+  const [roomCode, setRoomCode] = useState<string>(() => PeerManager.generateRoomCode());
   const [myRole, setMyRole] = useState<PlayerRole>('host');
   const [myPlayerId, setMyPlayerId] = useState<PlayerId>(1);
   const [isConnecting, setIsConnecting] = useState<boolean>(false);
@@ -258,6 +258,9 @@ function CoupleBattleGame() {
         setIsConnecting(false);
         console.log('Host room open with ID:', id);
       },
+      onRoomCodeChanged: (newCode) => {
+        setRoomCode(newCode);
+      },
       onConnected: (conn) => {
         setIsConnected(true);
         soundManager.playSuccess();
@@ -282,6 +285,13 @@ function CoupleBattleGame() {
       onError: (err) => {
         console.warn('Host room error:', err);
         setIsConnecting(false);
+        if (err?.type === 'unavailable-id') {
+          const freshCode = PeerManager.generateRoomCode();
+          setRoomCode(freshCode);
+          setTimeout(() => {
+            createRoomAsHost(freshCode);
+          }, 300);
+        }
       },
     });
 
@@ -296,7 +306,9 @@ function CoupleBattleGame() {
       setRoomCode(clean);
       connectAsGuest(clean);
     } else {
-      createRoomAsHost('LOVE77');
+      const initialCode = PeerManager.generateRoomCode();
+      setRoomCode(initialCode);
+      createRoomAsHost(initialCode);
       // Show lobby on first entrance so host can easily copy link or choose mode
       setIsLobbyOpen(true);
     }
