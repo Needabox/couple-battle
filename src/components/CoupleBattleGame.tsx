@@ -76,6 +76,19 @@ export default function CoupleBattleGame() {
   });
 
   const peerManagerRef = useRef<PeerManager | null>(null);
+  const playedCardIdsRef = useRef<Set<number>>(new Set());
+
+  // Non-repeating random drawer across all 130+ cards
+  const getRandomCard = useCallback((): ChanceCard => {
+    let available = CHANCE_CARDS.filter((c) => !playedCardIdsRef.current.has(c.id));
+    if (available.length === 0) {
+      playedCardIdsRef.current.clear();
+      available = CHANCE_CARDS;
+    }
+    const chosen = available[Math.floor(Math.random() * available.length)];
+    playedCardIdsRef.current.add(chosen.id);
+    return chosen;
+  }, []);
 
   // Handle Incoming Peer Messages
   const handlePeerData = useCallback((msg: PeerMessage) => {
@@ -121,7 +134,9 @@ export default function CoupleBattleGame() {
       case 'SHOW_CHALLENGE': {
         const { tileId, isChance, chanceCardId } = msg.payload;
         const targetTile = BOARD_TILES.find((t) => t.id === tileId);
-        const card = chanceCardId ? CHANCE_CARDS.find((c) => c.id === chanceCardId) : undefined;
+        const card = chanceCardId 
+          ? (CHANCE_CARDS.find((c) => c.id === chanceCardId) || getRandomCard()) 
+          : getRandomCard();
         setModalState({
           isOpen: true,
           isChance: !!isChance,
@@ -430,47 +445,30 @@ export default function CoupleBattleGame() {
   // When pawn lands on tile
   const handleTileLanded = (tileIndex: number, player: PlayerId, isInitiator: boolean) => {
     const tile = BOARD_TILES[tileIndex];
+    const isChance = tile.type === 'chance';
+    const card = getRandomCard();
 
-    if (tile.type === 'chance') {
-      const randomIdx = Math.floor(Math.random() * CHANCE_CARDS.length);
-      const card = CHANCE_CARDS[randomIdx];
+    setModalState({
+      isOpen: true,
+      isChance,
+      tile,
+      chanceCard: card,
+    });
 
-      setModalState({
-        isOpen: true,
-        isChance: true,
-        tile,
-        chanceCard: card,
-      });
+    if (isChance) {
       soundManager.playChanceCard();
+    }
 
-      if (isInitiator && !isSingleDevice && peerManagerRef.current?.isConnected()) {
-        peerManagerRef.current.sendMessage({
-          type: 'SHOW_CHALLENGE',
-          payload: {
-            tileId: tile.id,
-            isChance: true,
-            chanceCardId: card.id,
-          },
-          timestamp: Date.now(),
-        });
-      }
-    } else {
-      setModalState({
-        isOpen: true,
-        isChance: false,
-        tile,
+    if (isInitiator && !isSingleDevice && peerManagerRef.current?.isConnected()) {
+      peerManagerRef.current.sendMessage({
+        type: 'SHOW_CHALLENGE',
+        payload: {
+          tileId: tile.id,
+          isChance,
+          chanceCardId: card.id,
+        },
+        timestamp: Date.now(),
       });
-
-      if (isInitiator && !isSingleDevice && peerManagerRef.current?.isConnected()) {
-        peerManagerRef.current.sendMessage({
-          type: 'SHOW_CHALLENGE',
-          payload: {
-            tileId: tile.id,
-            isChance: false,
-          },
-          timestamp: Date.now(),
-        });
-      }
     }
   };
 
@@ -615,21 +613,22 @@ export default function CoupleBattleGame() {
           diceValue={diceValue}
           onRollDice={handleRollDiceClick}
           onTileClick={(tile) => {
+            const card = getRandomCard();
             setModalState({
               isOpen: true,
               isChance: tile.type === 'chance',
               tile,
-              chanceCard: tile.type === 'chance' ? CHANCE_CARDS[0] : undefined,
+              chanceCard: card,
             });
             soundManager.playClick();
           }}
           onSendReaction={handleSendReaction}
           onOpenChancePreview={() => {
-            const random = CHANCE_CARDS[Math.floor(Math.random() * CHANCE_CARDS.length)];
+            const card = getRandomCard();
             setModalState({
               isOpen: true,
               isChance: true,
-              chanceCard: random,
+              chanceCard: card,
             });
             soundManager.playChanceCard();
           }}
@@ -637,7 +636,7 @@ export default function CoupleBattleGame() {
       </div>
 
       {/* Floating Bottom Bar: Quick Chat & Actions */}
-      <div className="w-full max-w-md mx-auto px-4 flex items-center justify-between gap-2 z-20">
+      <div className="w-full max-w-lg mx-auto px-2.5 sm:px-4 py-1 flex items-center justify-between gap-1.5 z-20">
         <button
           type="button"
           onClick={() => {
@@ -645,20 +644,20 @@ export default function CoupleBattleGame() {
             setUnreadChatCount(0);
             soundManager.playClick();
           }}
-          className="relative px-4 py-2 bg-white hover:bg-pink-50 text-stone-800 rounded-full border-2 border-stone-800 toy-shadow-sm flex items-center gap-2 text-xs font-bold transition-transform active:scale-95 cursor-pointer"
+          className="relative px-3 sm:px-4 py-1.5 sm:py-2 bg-white hover:bg-pink-50 text-stone-800 rounded-full border-1.5 sm:border-2 border-stone-800 toy-shadow-sm flex items-center gap-1.5 text-[11px] sm:text-xs font-bold transition-transform active:scale-95 cursor-pointer"
         >
-          <MessageSquare className="w-4 h-4 text-pink-500" />
+          <MessageSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-pink-500" />
           <span>Chat Mesra</span>
           {unreadChatCount > 0 && (
-            <span className="w-5 h-5 bg-rose-500 text-white rounded-full flex items-center justify-center text-[10px] font-extrabold animate-bounce">
+            <span className="w-4 h-4 sm:w-5 sm:h-5 bg-rose-500 text-white rounded-full flex items-center justify-center text-[9px] sm:text-[10px] font-extrabold animate-bounce">
               {unreadChatCount}
             </span>
           )}
         </button>
 
-        <div className="flex items-center gap-1.5 bg-white/90 px-3 py-1.5 rounded-full border border-stone-300 toy-shadow-sm text-xs font-fun font-bold text-stone-700">
+        <div className="flex items-center gap-1 sm:gap-1.5 bg-white/95 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border border-stone-300 toy-shadow-sm text-[10px] sm:text-xs font-fun font-bold text-stone-700">
           <span>{players[1].avatar} {players[1].name} ({players[1].score})</span>
-          <span className="text-pink-400">vs</span>
+          <span className="text-pink-400 font-sans">vs</span>
           <span>{players[2].avatar} {players[2].name} ({players[2].score})</span>
         </div>
       </div>

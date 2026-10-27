@@ -137,21 +137,46 @@ export const ChallengeModal: React.FC<ChallengeModalProps> = ({
             </div>
 
             {/* The Main Challenge / Question Text */}
-            <div className="bg-white p-4 sm:p-5 rounded-2xl border-2 border-stone-800 toy-shadow-sm space-y-2">
+            <div className="bg-white p-3.5 sm:p-5 rounded-2xl border-2 border-stone-800 toy-shadow-sm space-y-2">
               {isChance ? (
                 <>
                   <h4 className="font-fun text-base sm:text-lg font-bold text-amber-900 leading-snug">
                     {chanceCard?.question}
                   </h4>
-                  <p className="text-xs sm:text-sm text-stone-600 italic">
-                    💡 {chanceCard?.instruction}
-                  </p>
+                  {chanceCard?.instruction && (
+                    <p className="text-xs sm:text-sm text-stone-600 italic">
+                      💡 {chanceCard?.instruction}
+                    </p>
+                  )}
                 </>
               ) : (
                 <>
-                  <h4 className="font-fun text-base sm:text-lg font-bold text-stone-900 leading-snug">
+                  <h4 className="font-fun text-sm sm:text-base font-bold text-stone-900 leading-snug">
                     {tile?.description}
                   </h4>
+
+                  {/* Dynamic randomized challenge/question from 130+ card deck */}
+                  {chanceCard && (
+                    <div className="mt-2 pt-2 border-t border-dashed border-stone-300 bg-amber-50/70 p-2.5 rounded-xl">
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <span className="text-[9px] sm:text-[10px] font-extrabold uppercase px-1.5 py-0.2 rounded-md bg-amber-200 text-amber-900 border border-amber-300">
+                          {chanceCard.category || 'Tantangan Acak'}
+                        </span>
+                        <span className="text-[10px] font-fun font-bold text-stone-500">
+                          #{chanceCard.id}
+                        </span>
+                      </div>
+                      <p className="font-fun text-xs sm:text-sm font-bold text-amber-950 leading-snug">
+                        "{chanceCard.question}"
+                      </p>
+                      {chanceCard.instruction && (
+                        <p className="text-[10px] sm:text-xs text-stone-600 italic mt-1">
+                          💡 {chanceCard.instruction}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
                   {tile?.type === 'roll_again' && (
                     <p className="text-xs text-amber-700 font-bold flex items-center gap-1 mt-1">
                       <Dices className="w-4 h-4" /> Giliran kamu tidak berganti, lempar dadu lagi!

@@ -34,10 +34,10 @@ export const Board: React.FC<BoardProps> = ({
   onOpenChancePreview,
 }) => {
   return (
-    <div className="w-full max-w-4xl mx-auto p-1.5 sm:p-4 select-none">
+    <div className="w-full max-w-[430px] sm:max-w-4xl mx-auto p-1 sm:p-3 select-none flex items-center justify-center">
       {/* 6x6 Board Grid Loop */}
       <div 
-        className="w-full aspect-square max-h-[82vh] grid grid-cols-6 grid-rows-6 gap-1 sm:gap-2 p-1.5 sm:p-3 rounded-3xl sm:rounded-4xl bg-[#FFF9E6] border-3 sm:border-4 border-[#2D2A26] toy-shadow-lg relative overflow-hidden"
+        className="w-full aspect-square max-h-[76vh] sm:max-h-[82vh] grid grid-cols-6 grid-rows-6 gap-1 sm:gap-2 p-1 sm:p-3 rounded-2xl sm:rounded-4xl bg-[#FFF9E6] border-2.5 sm:border-4 border-[#2D2A26] toy-shadow sm:toy-shadow-lg relative"
       >
         {/* Render Perimeter Tiles */}
         {BOARD_TILES.map((tile) => {
