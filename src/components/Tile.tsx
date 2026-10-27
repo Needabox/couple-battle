@@ -59,55 +59,55 @@ export const Tile: React.FC<TileProps> = ({
     <div
       style={gridStyle}
       onClick={() => onTileClick?.(tile)}
-      className={`relative select-none rounded-xl sm:rounded-2xl border-2 sm:border-2.5 border-[#2D2A26] toy-shadow-sm transition-all duration-200 cursor-pointer flex flex-col justify-between p-1 sm:p-2 group hover:scale-[1.02] active:scale-[0.98] ${
-        isCorner ? 'font-bold' : ''
-      } ${hasPlayer ? 'ring-2 ring-pink-400/80 z-20' : ''}`}
+      className={`relative select-none rounded-xl sm:rounded-2xl border-2 sm:border-2.5 md:border-3 border-[#2D2A26] toy-shadow-sm transition-all duration-200 cursor-pointer flex flex-col items-center justify-between p-1 sm:p-1.5 md:p-2 overflow-hidden group hover:scale-[1.02] active:scale-[0.98] ${
+        isCorner ? 'font-black' : ''
+      } ${hasPlayer ? 'ring-2 sm:ring-3 ring-pink-400 z-20' : ''}`}
     >
       {/* Background color layer */}
       <div 
-        className="absolute inset-0 rounded-xl sm:rounded-2xl opacity-95 transition-colors"
+        className="absolute inset-0 opacity-95 transition-colors"
         style={{ backgroundColor: tile.bgColor }}
       />
 
-      {/* Decorative patterns for chance & special tiles */}
+      {/* Decorative patterns for chance & safe tiles */}
       {tile.type === 'chance' && (
-        <div className="absolute inset-0 bg-checkered-yellow opacity-25 pointer-events-none rounded-xl sm:rounded-2xl" />
+        <div className="absolute inset-0 bg-checkered-yellow opacity-25 pointer-events-none" />
       )}
       {tile.type === 'safe' && (
-        <div className="absolute inset-0 bg-checkered-pink opacity-20 pointer-events-none rounded-xl sm:rounded-2xl" />
+        <div className="absolute inset-0 bg-checkered-pink opacity-20 pointer-events-none" />
       )}
 
-      {/* Top Bar: Tile ID / Badge */}
-      <div className="relative z-10 flex items-center justify-between w-full leading-none">
+      {/* Top Row: Tile ID or Badge */}
+      <div className="relative z-10 flex items-center justify-between w-full shrink-0 leading-none">
         {tile.badge ? (
           <span 
-            className="text-[7px] sm:text-[9px] font-extrabold px-1 py-0.5 rounded-full uppercase tracking-wider text-white border border-black/40 shadow-xs"
+            className="text-[7.5px] xs:text-[8.5px] sm:text-[10px] md:text-xs font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider text-white border border-black/40 shadow-xs"
             style={{ backgroundColor: tile.textColor }}
           >
             {tile.badge}
           </span>
         ) : (
-          <span className="text-[7px] sm:text-[9px] font-bold text-stone-500 opacity-70">
+          <span className="text-[7.5px] xs:text-[8.5px] sm:text-[10px] md:text-xs font-black text-stone-500 opacity-70">
             #{tile.id}
           </span>
         )}
 
         {tile.type === 'chance' && !hasPlayer && (
-          <span className="text-[9px] sm:text-xs font-fun font-bold text-amber-700 animate-bounce">
+          <span className="text-[9px] sm:text-xs md:text-sm font-fun font-black text-amber-700 animate-bounce">
             ?
           </span>
         )}
       </div>
 
-      {/* Center Area: Player Avatar(s) if present, else Tile Icon */}
-      <div className="relative z-10 flex-1 flex flex-col items-center justify-center my-auto text-center px-0.5">
+      {/* Center Area: Player Avatar(s) or Tile Icon */}
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-center w-full min-h-0 text-center my-0.5">
         {hasPlayer ? (
-          /* Prominent Centered Player Pawns (Never submerged!) */
-          <div className="flex items-center justify-center -space-x-1.5 sm:space-x-1 my-0.5 sm:my-1">
+          /* Centered Player Pawns */
+          <div className="flex items-center justify-center -space-x-1 sm:space-x-1">
             {isP1Here && (
               <div 
                 title={player1.name}
-                className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-pink-500 text-white flex items-center justify-center text-xs sm:text-base border-2 border-white shadow-md animate-bounce ring-2 ring-pink-400 z-10"
+                className="w-5 h-5 xs:w-6 xs:h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full bg-pink-500 text-white flex items-center justify-center text-[10px] xs:text-xs sm:text-base md:text-xl border-1.5 sm:border-2 border-white shadow-md animate-bounce ring-2 ring-pink-400 z-10"
               >
                 {player1.avatar || '🐱'}
               </div>
@@ -115,7 +115,7 @@ export const Tile: React.FC<TileProps> = ({
             {isP2Here && (
               <div 
                 title={player2.name}
-                className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-sky-500 text-white flex items-center justify-center text-xs sm:text-base border-2 border-white shadow-md animate-bounce ring-2 ring-sky-400 z-10"
+                className="w-5 h-5 xs:w-6 xs:h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full bg-sky-500 text-white flex items-center justify-center text-[10px] xs:text-xs sm:text-base md:text-xl border-1.5 sm:border-2 border-white shadow-md animate-bounce ring-2 ring-sky-400 z-10"
                 style={{ animationDelay: '0.15s' }}
               >
                 {player2.avatar || '🐰'}
@@ -123,37 +123,27 @@ export const Tile: React.FC<TileProps> = ({
             )}
           </div>
         ) : (
-          /* Default Tile Icon */
+          /* Compact Tile Icon (Leaves abundant room for big title!) */
           <div 
-            className="p-0.5 sm:p-1 rounded-lg transition-transform group-hover:scale-110"
+            className="p-0.5 rounded-lg transition-transform group-hover:scale-110"
             style={{ color: tile.textColor }}
           >
-            <IconComponent className={isCorner ? 'w-4 h-4 sm:w-6 sm:h-6' : 'w-3.5 h-3.5 sm:w-5 sm:h-5'} />
+            <IconComponent className={isCorner ? 'w-4 h-4 sm:w-5 sm:h-5 md:w-7 md:h-7' : 'w-3.5 h-3.5 sm:w-4.5 sm:h-4.5 md:w-6 md:h-6'} />
           </div>
         )}
-
-        <h4 
-          className={`font-fun leading-tight text-center line-clamp-2 ${
-            isCorner ? 'text-[9px] sm:text-xs font-extrabold' : 'text-[8px] sm:text-[10.5px] font-bold'
-          }`}
-          style={{ color: tile.textColor }}
-        >
-          {tile.title}
-        </h4>
-
-        {tile.subtitle && (
-          <p className="hidden sm:block text-[8px] text-stone-600 font-medium opacity-80 mt-0.5 truncate max-w-full">
-            {tile.subtitle}
-          </p>
-        )}
       </div>
 
-      {/* Bottom status dot when player is on tile */}
-      <div className="relative z-10 min-h-[4px] sm:min-h-[6px] flex items-center justify-center">
-        {hasPlayer && (
-          <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-rose-500 animate-ping" />
-        )}
-      </div>
+      {/* Bottom Area: Big, Bold, and Clear Title that NEVER overflows */}
+      <h4 
+        className={`relative z-10 w-full text-center font-fun font-black leading-tight shrink-0 line-clamp-2 px-0.5 pb-0.5 ${
+          isCorner 
+            ? 'text-[9.5px] xs:text-[11px] sm:text-xs md:text-sm lg:text-[15px] uppercase tracking-tight' 
+            : 'text-[9px] xs:text-[10px] sm:text-[11px] md:text-xs lg:text-[14px]'
+        }`}
+        style={{ color: tile.textColor }}
+      >
+        {tile.title}
+      </h4>
     </div>
   );
 };
