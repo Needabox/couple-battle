@@ -1,26 +1,113 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --font-fredoka: "Fredoka", cursive, sans-serif;
+    --font-quicksand: "Quicksand", sans-serif;
+  }
+
+  body {
+    font-family: var(--font-quicksand), sans-serif;
+    background-color: #FFFDF0;
+    color: #2D2424;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, .font-fun {
+    font-family: var(--font-fredoka), cursive, sans-serif;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Doodle star background pattern */
+.bg-doodle-stars {
+  background-color: #FFFDEB;
+  background-image: 
+    radial-gradient(#FDE047 1.5px, transparent 1.5px),
+    radial-gradient(#FBCFE8 1.5px, #FFFDEB 1.5px);
+  background-size: 32px 32px;
+  background-position: 0 0, 16px 16px;
+}
+
+/* Checkered pattern for Chance Cards */
+.bg-checkered-yellow {
+  background-color: #FEF9C3;
+  background-image: repeating-linear-gradient(45deg, #FDE047 25%, transparent 25%, transparent 75%, #FDE047 75%, #FDE047), repeating-linear-gradient(45deg, #FDE047 25%, #FEF9C3 25%, #FEF9C3 75%, #FDE047 75%, #FDE047);
+  background-position: 0 0, 10px 10px;
+  background-size: 20px 20px;
+}
+
+.bg-checkered-pink {
+  background-color: #FDF2F8;
+  background-image: repeating-linear-gradient(45deg, #F472B6 25%, transparent 25%, transparent 75%, #F472B6 75%, #F472B6), repeating-linear-gradient(45deg, #F472B6 25%, #FDF2F8 25%, #FDF2F8 75%, #F472B6 75%, #F472B6);
+  background-position: 0 0, 10px 10px;
+  background-size: 20px 20px;
+}
+
+/* Playful cartoon shadow & borders */
+.toy-shadow {
+  box-shadow: 0 4px 0 #1E1B18;
+}
+
+.toy-shadow-sm {
+  box-shadow: 0 2.5px 0 #1E1B18;
+}
+
+.toy-shadow-lg {
+  box-shadow: 0 6px 0 #1E1B18;
+}
+
+.toy-shadow-pink {
+  box-shadow: 0 4px 0 #F43F5E;
+}
+
+.toy-shadow-pressed:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #1E1B18;
+}
+
+/* Custom 3D Dice styling */
+.dice-cube {
+  perspective: 600px;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FFFDF0;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #FBBF24;
+  border-radius: 9999px;
+}
+
+/* Floating animation */
+@keyframes floatGentle {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-6px) rotate(1.5deg);
+  }
+}
+
+.animate-float {
+  animation: floatGentle 3s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.6));
+  }
+  50% {
+    filter: drop-shadow(0 0 18px rgba(244, 63, 94, 0.8));
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 2.5s ease-in-out infinite;
 }
